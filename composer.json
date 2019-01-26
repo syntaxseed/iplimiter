@@ -1,0 +1,25 @@
+{
+    "name": "syntaxseed/iplimiter",
+    "description": "PDO IP logging class to record, check and enforce number of attempts, and time since last attempt.",
+    "keywords": ["IP", "logging", "PDO", "limiting", "IP Address"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sherri Wheeler",
+            "homepage": "http://syntaxseed.com",
+            "role": "Developer"
+        }
+    ],
+    "type": "library",
+    "require": {
+		"php": ">=7.2"
+    },
+	"require-dev": {
+		"phpunit/phpunit": "5.2.*"
+    },
+	"autoload": {
+        "psr-4": {
+            "Syntaxseed\\IPLimiter\\": "src/"
+        }
+    }
+}
