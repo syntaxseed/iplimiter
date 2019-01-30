@@ -3,6 +3,8 @@ IPLimiter
 
 A lightweight PHP IP address logging library for tracking the # of attempts, and time of last attempt for various categories of events. An event is an IP address and category string combo. The library includes helpers for setting/getting ban status, deleting individual events or all events for a given IP, etc.
 
+![IPLimiter Screenshot](iplimiter_screenshot.png "Using IPLimiter for PHP IP event logging.")
+
 The IPLimiter constructor must be passed a connected PDO object to create a database table and log the events.
 
 The core function of the library is to execute a set of 'rules' which IPLimiter will then determine whether the IP address passes or fails the ruleset, and therefore whether they should be allowed to proceed. Rules can specifiy a max # of attempts, and how long it must be before the next attempt. And whether ban status matters for this rule. An example will follow.
@@ -188,6 +190,7 @@ Contributing
 
 Changelog
 --------
+* v1.0.4 - Add screenshot to readme.
 * v1.0.3 - Allow method chaining on the event() and log() methods.
 * v1.0.2 - Improve readme. Better package description.
 * v1.0.1 - Fix readme.
