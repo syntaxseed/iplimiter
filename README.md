@@ -3,26 +3,27 @@ IPLimiter
 
 A lightweight PHP IP address logging library for tracking the # of attempts, and time of last attempt for various categories of events. An event is an IP address and category string combo. The library includes helpers for setting/getting ban status, deleting individual events or all events for a given IP, etc.
 
-IPLimiter must be passed a connected PDO object to create a database table and log the events.
+The IPLimiter constructor must be passed a connected PDO object to create a database table and log the events.
 
-The core function of the library is to execute a set of 'rules' which IPLimiter will then determine whether the IP address passes or fails the ruleset, and therefor whether they should be allowed to proceed. Rules can specifiy a max # of attempts, and how long it must be before the next attempt. And whether ban status matters for this rule. An example will follow.
+The core function of the library is to execute a set of 'rules' which IPLimiter will then determine whether the IP address passes or fails the ruleset, and therefore whether they should be allowed to proceed. Rules can specifiy a max # of attempts, and how long it must be before the next attempt. And whether ban status matters for this rule. An example will follow.
 
 Licence: MIT.
 
-Author: Sherri Wheeler sherri.syntaxseed[at]ofitall[dot]com
+Author: Sherri Wheeler
 
 
 Features
 --------
 
 * Compliant with IPv4 and IPv6 addresses.
-* Unit-Testing with PHPUnit.
 * Simple to learn and use.
 * Track and run rules against:
   * Number of attempts.
   * Time since last attempt.
   * Ban status.
 * Reset # attempts after a given time has passed.
+* Flexible. IP Addresses and event strings can be anything.
+* Unit-Testing with PHPUnit.
 
 
 Installation
@@ -30,7 +31,7 @@ Installation
 
 Require with Composer:
 ```
-./composer.phar require syntaxseed/iplimiter ^1.0
+composer require syntaxseed/iplimiter ^1.0
 ```
 
 
@@ -49,18 +50,22 @@ Initialize a PDO object and use it to create a new IPLimiter instance. The secon
 $ipLimiter = new IPLimiter($pdo, 'syntaxseed_iplimiter');
 ```
 
-Create the IPLimiter table if it doesn't already exist. This and future functions will use the PDO object injected via the constructor.
+**Create the IPLimiter table if it doesn't already exist.**
+
+This and future functions will use the PDO object injected via the constructor.
 ```
 $result = $ipLimiter->migrate();
 ```
 
-Log a new event. An event has an IP address and a string 'category'. Working with events requires an event to have been set.
+**Log a new event.**
+
+An event has an IP address and a string 'category'. Working with events requires an event to have been set.
 ```
 $ipLimiter->event('123.123.0.1', 'sendmail');
 $ipLimiter->log();
 ```
 
-Get or reset the # of attemps for a given event.
+**Get or reset the # of attemps for a given event.**
 ```
 $ipLimiter->event('123.123.0.1', 'sendmail');
 $ipLimiter->log();
@@ -71,7 +76,7 @@ $ipLimiter->resetAttempts();
     // Sets value to 0.
 ```
 
-Get or reset the time since last attempt.
+**Get or reset the time since last attempt.**
 ```
 $ipLimiter->event('123.123.0.1', 'sendmail');
 $ipLimiter->log();
@@ -82,20 +87,24 @@ $lastSeconds = $ipLimiter->last();
 ```
 Note: You cannot rest the time since last attempt. If there is a record in the database for this event, then it has a timestamp. To solve this, just delete the event completely, which equates to 'never'.
 
-Delete an event.
+**Delete an event.**
 ```
 $ipLimiter->event('123.123.0.1', 'sendmail');
 $ipLimiter->log();
 $ipLimiter->deleteEvent();
 ```
 
-Delete ALL events for a given IP. This function does NOT require an event to be set, instead, pass in the IP address.
+**Delete ALL events for a given IP.**
+
+This function does NOT require an event to be set, instead, pass in the IP address.
 ```
 $result = $ipLimiter->deleteIP('123.123.0.1');
 // Returns false if no records were found/deleted. True otherwise.
 ```
 
-Manage ban status for an event. Note that with this method, an IP is banned from individual categories of events, not banned system-wide. Setting ban status methods return the current ban status, NOT whether the ban/unban set succeeded or not.
+**Manage ban status for an event.**
+
+ Note that with this method, an IP is banned from individual categories of events, not banned system-wide. The ban/unBan methods return the current ban status, NOT whether the ban/unban set succeeded or not.
 ```
 $ipLimiter->event('123.123.0.1', 'sendmail');
 $ipLimiter->log();
@@ -115,7 +124,7 @@ A core feature of IPLimiter is running an event against a ruleset to see if it p
 
 **Rule Example: Sending Mail**
 
-In our application, users can only send mail at most every 5 minutes (300 seconds). They can make at most 3 attempts at sending mail before the reset time. Ban status matters for this ruleset (ie some events might use ban status for other purposes but not for rules). Attempts get reset every hour (3600 seconds).
+In our application, users can only send mail at most every 5 minutes (300 seconds). They can make at most 3 attempts at sending mail before the reset time. Ban status matters for this ruleset (ie some events might use ban status for other purposes but not for rules). Attempts get reset after an hour of no attempts (3600 seconds).
 
 Our ruleset in JSON format:
 ```
@@ -158,11 +167,10 @@ $ruleResult = $ipLimiter->rule('{
             "allowBanned":false
         }');
 
-// $ruleResult is true because -1 means ignore time since last event, and only look at attempts. 1 <=3 so PASS.
+// $ruleResult is true because -1 means ignore time since last event, and only look at attempts. 1 <= 3 so PASS.
 ```
 
 **TIP:** Parts of the ruleset "resetAtSeconds", "waitAtLeast", and "allowedAttempts"  can be set to -1 to ignore this part.
-
 
 
 Contributing
@@ -173,4 +181,6 @@ Contributing
 
 Changelog
 --------
-* v1.1.0 - Initial release. Under development.
+* v1.0.2 - Improve readme. Better package description.
+* v1.0.1 - Fix readme.
+* v1.0.0 - Initial release.
