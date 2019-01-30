@@ -19,7 +19,7 @@ Features
 * Unit-Testing with PHPUnit.
 * Simple to learn and use.
 * Track and run rules against:
-  * # of attempts.
+  * Number of attempts.
   * Time since last attempt.
   * Ban status.
 * Reset # attempts after a given time has passed.
@@ -30,7 +30,7 @@ Installation
 
 Require with Composer:
 ```
-./composer.phar require syntaxseed/iplimiter ^1.1
+./composer.phar require syntaxseed/iplimiter ^1.0
 ```
 
 
