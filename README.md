@@ -65,6 +65,13 @@ $ipLimiter->event('123.123.0.1', 'sendmail');
 $ipLimiter->log();
 ```
 
+Or, you can method chain the initialization of the object, setting of event, and logging:
+```
+$ipLimiter = (new IPLimiter($pdo, 'syntaxseed_iplimiter'))
+            ->event('123.123.0.1', 'sendmail')
+            ->log();
+```
+
 **Get or reset the # of attemps for a given event.**
 ```
 $ipLimiter->event('123.123.0.1', 'sendmail');
@@ -181,6 +188,7 @@ Contributing
 
 Changelog
 --------
+* v1.0.3 - Allow method chaining on the event() and log() methods.
 * v1.0.2 - Improve readme. Better package description.
 * v1.0.1 - Fix readme.
 * v1.0.0 - Initial release.

@@ -91,9 +91,27 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
         $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
         $ipLimiter->event('0.0.0.1', 'phpunit');
         $ipLimiter->log();
-        $attempts = $ipLimiter->attempts();
 
+        $attempts = $ipLimiter->attempts();
         $this->assertEquals(1, $attempts);
+
+        $result = $ipLimiter->deleteEvent();
+    }
+
+    /**
+    * Test logging a visit and get the count for it.
+    */
+    public function testMethodChainedLogging()
+    {
+        $ipLimiter = (new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter'))
+                    ->event('0.0.0.1', 'phpunit')
+                    ->log()
+                    ->log();
+
+        $attempts = $ipLimiter->attempts();
+        $this->assertEquals(2, $attempts);
+
+        $result = $ipLimiter->deleteEvent();
     }
 
     /**

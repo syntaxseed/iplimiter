@@ -54,6 +54,29 @@ class IPLimiter
     {
         $this->ip = $ip;
         $this->category = $category;
+        return $this;
+    }
+
+    /**
+     * Log an action by an IP for a given category.
+     *
+     * @return IPLimiter
+     * @throws Exception
+     */
+    public function log()
+    {
+        $this->checkEvent();
+
+        try {
+            $sql = 'INSERT INTO '.$this->tableName.' (ip, category) VALUES (:ip, :category) ON DUPLICATE KEY UPDATE attempts=attempts+1, lastattempt=NOW();';
+            $stmt = $this->pdo
+                        ->prepare($sql)
+                        ->execute([$this->ip, $this->category]);
+        } catch (\PDOException $e) {
+            $this->lastError = $e->getMessage();
+            throw new \Exception($this->lastError);
+        }
+        return $this;
     }
 
     /**
@@ -115,28 +138,6 @@ class IPLimiter
             throw new \Exception($this->lastError);
             exit();
         }
-    }
-
-    /**
-     * Log an action by an IP for a given category.
-     *
-     * @return bool
-     * @throws Exception
-     */
-    public function log()
-    {
-        $this->checkEvent();
-
-        try {
-            $sql = 'INSERT INTO '.$this->tableName.' (ip, category) VALUES (:ip, :category) ON DUPLICATE KEY UPDATE attempts=attempts+1, lastattempt=NOW();';
-            $stmt = $this->pdo
-                        ->prepare($sql)
-                        ->execute([$this->ip, $this->category]);
-        } catch (\PDOException $e) {
-            $this->lastError = $e->getMessage();
-            throw new \Exception($this->lastError);
-        }
-        return true;
     }
 
     /**
