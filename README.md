@@ -1,7 +1,7 @@
 IPLimiter
 =========================
 
-A lightweight PHP IP address logging library for tracking the # of attempts, and time of last attempt for various categories of events. An event is an IP address and category string combo. The library includes helpers for setting/getting ban status, deleting individual events or all events for a given IP, etc.
+A lightweight, framework agnostic, PHP IP address logging library for tracking the # of attempts, and time of last attempt for various categories of events. An event is an IP address and category string combo. The library includes helpers for setting/getting ban status, deleting individual events or all events for a given IP, etc.
 
 ![IPLimiter Screenshot](iplimiter_screenshot.png "Using IPLimiter for PHP IP event logging.")
 

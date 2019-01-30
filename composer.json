@@ -1,6 +1,6 @@
 {
     "name": "syntaxseed/iplimiter",
-    "description": "A PHP IP logging library to track attempts and time since last attempt for an event by an IP address. Run an event against a ruleset to determine pass/fail. Supports banning.",
+    "description": "A PHP IP logging library (framework agnostic) to track attempts and time since last attempt for an event by an IP address. Run an event against a ruleset to determine pass/fail. Supports banning.",
     "keywords": ["IP", "logging", "PDO", "limiting", "IP Address"],
     "license": "MIT",
     "authors": [
