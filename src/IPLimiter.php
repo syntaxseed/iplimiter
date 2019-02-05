@@ -140,6 +140,32 @@ class IPLimiter
         }
     }
 
+     /**
+     * Determine whether a record exists in the DB for this event.
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function exists()
+    {
+        $this->checkEvent();
+
+        try {
+            $sql = 'SELECT (1) as found FROM '.$this->tableName.' WHERE ip=:ip AND category=:category;';
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$this->ip, $this->category]);
+            $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            $this->lastError = $e->getMessage();
+            throw new \Exception($this->lastError);
+        }
+
+        if (!$result) {
+            return false;
+        }
+        return ($result[0]['found'] == "1");
+    }
+
     /**
      * Get attempts by an IP on a given category.
      *
@@ -240,6 +266,7 @@ class IPLimiter
      *         "allowBanned":false
      *      }
      * Means:
+     *     - If record doesn't exist in the database, PASS.
      *     - If last attempt was at or older than (>=) "resetAtSeconds" seconds ago, reset attempts to 0. -1 for don't reset.
      *     - If last attempt was more recent than (<) "waitAtLeast" seconds ago, FAIL. -1 for ignore.
      *     - If current attempts is more than (>) "allowedAttempts", FAIL. -1 for ignore.
@@ -257,6 +284,11 @@ class IPLimiter
         }
 
         $rule = json_decode($rule);
+
+        // RULE STEP 0: Check if there is even a record in the DB.
+        if (!$this->exists()) {
+            return true; // Does not exist in DB.
+        }
 
         // RULE STEP 1: If last attempt was >= "resetAtSeconds" seconds ago, set attempts to 0. -1 for don't reset.
         $last = $this->last();

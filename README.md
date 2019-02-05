@@ -74,6 +74,16 @@ $ipLimiter = (new IPLimiter($pdo, 'syntaxseed_iplimiter'))
             ->log();
 ```
 
+**Get whether an event exists in the dabase.**
+```
+$ipLimiter->event('111.111.111.111', 'sendmail');
+$isLogged = $ipLimiter->exists();
+    // $isLogged is false.
+$ipLimiter->log();
+$isLogged = $ipLimiter->exists();
+    // $isLogged is true.
+```
+
 **Get or reset the # of attemps for a given event.**
 ```
 $ipLimiter->event('123.123.0.1', 'sendmail');
@@ -145,6 +155,7 @@ Our ruleset in JSON format:
 }
 ```
 This means:
+- If a record doesn't exist in the database, PASS.
 - If last attempt was at or older than (>=) 3600 seconds ago, reset attempts to 0.
 - If last attempt was more recent than (<) 300 seconds ago, FAIL.
 - If current attempts is more than (>) 3, FAIL.

@@ -168,6 +168,27 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+    * Test getting if an event exists.
+    */
+    public function testEventExists()
+    {
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
+        $ipLimiter->event('9.9.9.9', 'phpunit');
+        $ipLimiter->deleteEvent();
+
+        // Check record that does not exist.
+        $result = $ipLimiter->exists();
+        $this->assertFalse($result);
+
+        // Actually create an event.
+        $ipLimiter->log();
+
+        // Check record that does exist.
+        $result = $ipLimiter->exists();
+        $this->assertTrue($result);
+    }
+
+    /**
     * Test running a rule set.
     */
     public function testRules()
