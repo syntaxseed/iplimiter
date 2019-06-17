@@ -462,15 +462,15 @@ class IPLimiter
     {
         try {
             $sql = <<<EOF
-CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
-`ip` varchar(39) COLLATE ascii_general_ci NOT NULL,
-`category` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
-`attempts` int(10) unsigned NOT NULL DEFAULT '1',
-`lastattempt` datetime NOT NULL DEFAULT NOW(),
-`banned` tinyint(1) NOT NULL DEFAULT '0',
-PRIMARY KEY (`ip`, `category`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-EOF;
+                CREATE TABLE IF NOT EXISTS `{$this->tableName}` (
+                `ip` varchar(39) COLLATE ascii_general_ci NOT NULL,
+                `category` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
+                `attempts` int(10) unsigned NOT NULL DEFAULT '1',
+                `lastattempt` datetime NOT NULL DEFAULT NOW(),
+                `banned` tinyint(1) NOT NULL DEFAULT '0',
+                PRIMARY KEY (`ip`, `category`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+                EOF;
             $this->pdo->exec($sql);
         } catch (\PDOException $e) {
             $this->lastError = $e->getMessage();
