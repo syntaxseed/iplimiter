@@ -43,39 +43,39 @@ Usage - Quick Start
 First ensure you have a connected PDO object. (http://php.net/manual/en/book.pdo.php).
 
 Import the namespace into your application:
-```
+```php
 use Syntaxseed\IPLimiter\IPLimiter;
 ```
 
 Initialize a PDO object and use it to create a new IPLimiter instance. The second parameter is your desired database table name for IPLimiter to use.
-```
+```php
 $ipLimiter = new IPLimiter($pdo, 'syntaxseed_iplimiter');
 ```
 
 **Create the IPLimiter table if it doesn't already exist.**
 
 This and future functions will use the PDO object injected via the constructor.
-```
+```php
 $result = $ipLimiter->migrate();
 ```
 
 **Log a new event.**
 
 An event has an IP address and a string 'category'. Working with events requires an event to have been set.
-```
+```php
 $ipLimiter->event('123.123.0.1', 'sendmail');
 $ipLimiter->log();
 ```
 
 Or, you can method chain the initialization of the object, setting of event, and logging:
-```
+```php
 $ipLimiter = (new IPLimiter($pdo, 'syntaxseed_iplimiter'))
             ->event('123.123.0.1', 'sendmail')
             ->log();
 ```
 
 **Get whether an event exists in the dabase.**
-```
+```php
 $ipLimiter->event('111.111.111.111', 'sendmail');
 $isLogged = $ipLimiter->exists();
     // $isLogged is false.
@@ -85,7 +85,7 @@ $isLogged = $ipLimiter->exists();
 ```
 
 **Get or reset the # of attemps for a given event.**
-```
+```php
 $ipLimiter->event('123.123.0.1', 'sendmail');
 $ipLimiter->log();
 $ipLimiter->log();
@@ -96,7 +96,7 @@ $ipLimiter->resetAttempts();
 ```
 
 **Get or reset the time since last attempt.**
-```
+```php
 $ipLimiter->event('123.123.0.1', 'sendmail');
 $ipLimiter->log();
 $lastTime = $ipLimiter->last(false);
@@ -107,7 +107,7 @@ $lastSeconds = $ipLimiter->last();
 Note: You cannot rest the time since last attempt. If there is a record in the database for this event, then it has a timestamp. To solve this, just delete the event completely, which equates to 'never'.
 
 **Delete an event.**
-```
+```php
 $ipLimiter->event('123.123.0.1', 'sendmail');
 $ipLimiter->log();
 $ipLimiter->deleteEvent();
@@ -116,7 +116,7 @@ $ipLimiter->deleteEvent();
 **Delete ALL events for a given IP.**
 
 This function does NOT require an event to be set, instead, pass in the IP address.
-```
+```php
 $result = $ipLimiter->deleteIP('123.123.0.1');
 // Returns false if no records were found/deleted. True otherwise.
 ```
@@ -124,7 +124,7 @@ $result = $ipLimiter->deleteIP('123.123.0.1');
 **Manage ban status for an event.**
 
  Note that with this method, an IP is banned from individual categories of events, not banned system-wide. The ban/unBan methods return the current ban status, NOT whether the ban/unban set succeeded or not.
-```
+```php
 $ipLimiter->event('123.123.0.1', 'sendmail');
 $ipLimiter->log();
 $status = $ipLimiter->isBanned();
@@ -146,7 +146,7 @@ A core feature of IPLimiter is running an event against a ruleset to see if it p
 In our application, users can only send mail at most every 5 minutes (300 seconds). They can make at most 3 attempts at sending mail before the reset time. Ban status matters for this ruleset (ie some events might use ban status for other purposes but not for rules). Attempts get reset after an hour of no attempts (3600 seconds).
 
 Our ruleset in JSON format:
-```
+```php
 {
     "resetAtSeconds": 3600,
     "waitAtLeast": 300,
@@ -163,7 +163,7 @@ This means:
 - Otherwise, PASS.
 
 Execute the ruleset for the currently set event (will fail):
-```
+```php
 $ipLimiter->event('111.222.333.444', 'sendmail');
 $ipLimiter->log(); // User sent first mail.
 $ruleResult = $ipLimiter->rule('{
@@ -177,7 +177,7 @@ $ruleResult = $ipLimiter->rule('{
 ```
 
 Execute a ruleset for the currently set event (will pass):
-```
+```php
 $ipLimiter->event('111.222.333.444', 'sendmail');
 $ipLimiter->log(); // User sent first mail.
 $ruleResult = $ipLimiter->rule('{
