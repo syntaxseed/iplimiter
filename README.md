@@ -59,6 +59,8 @@ This and future functions will use the PDO object injected via the constructor.
 $result = $ipLimiter->migrate();
 ```
 
+> **Only run this ONCE. It will create the initial tables for you.**
+
 **Log a new event.**
 
 An event has an IP address and a string 'category'. Working with events requires an event to have been set.
