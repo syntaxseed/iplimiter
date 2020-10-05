@@ -1,18 +1,21 @@
 <?php
+use Syntaxseed\IPLimiter\DatabasePDO;
+
 /**
 *  Basic testing for IPLimiter.
 */
 
-class IPLimiterTest extends PHPUnit_Framework_TestCase
+class IPLimiterTest extends PHPUnit\Framework\TestCase
 {
     protected static $pdo;
+    protected static $db;
 
     private static function connectToDB()
     {
         $host = 'localhost';
-        $db   = 'db1_sandbox';
-        $user = 'db1_usr1';
-        $pass = 'DB1USR1rt6';
+        $db   = 'DBNAME';
+        $user = 'USER';
+        $pass = 'PASSWORD';
         $charset = 'utf8mb4';
 
         $dsn = "mysql:host={$host};dbname={$db};charset={$charset}";
@@ -32,7 +35,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     /**
      * Called before all tests in this class are run.
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass() : void
     {
         self::connectToDB();
     }
@@ -40,7 +43,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     /**
      * Called before each test method is run.
      */
-    protected function setUp()
+    protected function setUp() : void
     {}
 
     /**
@@ -48,7 +51,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     */
     public function testMigrateDatabaseTable()
     {
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
         $result = $ipLimiter->migrate();
         $this->assertTrue($result);
     }
@@ -59,19 +62,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     public function testNoConnectionGivesException()
     {
         $this->expectException(\Exception::class);
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(null, 'syntaxseed_iplimiter');
-    }
-
-    /**
-    * Test with a disconnected connection object.
-    */
-    public function testBadConnectionGivesException()
-    {
-        $this->expectException(\Exception::class);
-        @mysqli_close(self::$pdo);
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(null, 'syntaxseed_iplimiter');
-        unset($ipLimiter);
-        self::connectToDB();
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(new PDO(null)), 'syntaxseed_iplimiter');
     }
 
     /**
@@ -79,7 +70,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     */
     public function testValidClassInstantiation()
     {
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
         $this->assertTrue(is_object($ipLimiter));
     }
 
@@ -88,7 +79,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     */
     public function testBasicLogging()
     {
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
         $ipLimiter->event('0.0.0.1', 'phpunit');
         $ipLimiter->log();
 
@@ -103,7 +94,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     */
     public function testMethodChainedLogging()
     {
-        $ipLimiter = (new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter'))
+        $ipLimiter = (new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter'))
                     ->event('0.0.0.1', 'phpunit')
                     ->log()
                     ->log();
@@ -119,7 +110,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     */
     public function testResettingAttempts()
     {
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
         $ipLimiter->event('0.0.0.1', 'phpunit');
 
         $ipLimiter->log();
@@ -137,7 +128,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     */
     public function testDeleteEvent()
     {
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
         $ipLimiter->event('0.0.0.2', 'phpunit');
 
         // Delete record that doesn't exit.
@@ -157,13 +148,13 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     */
     public function testLastEventTime()
     {
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
         $ipLimiter->event('0.0.0.1', 'phpunit');
         //$ipLimiter->log();
         $last = $ipLimiter->last(false);
         $lastSecsAgo = $ipLimiter->last();
 
-        $this->assertInternalType("int", $last);
+        $this->assertIsInt($last);
         $this->assertLessThan($last, $lastSecsAgo);
     }
 
@@ -172,7 +163,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     */
     public function testEventExists()
     {
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
         $ipLimiter->event('9.9.9.9', 'phpunit');
         $ipLimiter->deleteEvent();
 
@@ -193,8 +184,8 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     */
     public function testRules()
     {
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
-        $ipLimiter->event('0.0.0.1', 'phpunit');
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
+        $ipLimiter->event('0.0.0.3', 'phpunit');
         $ipLimiter->deleteEvent();
         $ipLimiter->log();
         $ipLimiter->log();
@@ -237,6 +228,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
             "allowBanned":false
         }');
         $this->assertFalse($ruleResult);
+
     }
 
     /**
@@ -244,7 +236,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     */
     public function testBanning()
     {
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
         $ipLimiter->event('0.0.0.1', 'phpunit');
         $ipLimiter->log();
 
@@ -266,7 +258,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     */
     public function testDeleteIp()
     {
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
         $ipLimiter->event('0.0.0.1', 'phpunit');
         $ipLimiter->log();
         $ipLimiter->event('0.0.0.1', 'otherevent');
@@ -282,7 +274,7 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
 
     public function testIpV6Address()
     {
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
         $ipLimiter->event('2001:0db8:0000:0000:0000:ff00:0042:8329', 'phpunit');
         $ipLimiter->log();
         $ipLimiter->log();
@@ -297,11 +289,13 @@ class IPLimiterTest extends PHPUnit_Framework_TestCase
     /**
      * Called after all tests in this class are run.
      */
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass() : void
     {
-        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(self::$pdo, 'syntaxseed_iplimiter');
+        $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
         $ipLimiter->deleteIP('0.0.0.1');
         $ipLimiter->deleteIP('0.0.0.2');
+        $ipLimiter->deleteIP('0.0.0.3');
+        $ipLimiter->deleteIP('9.9.9.9');
         self::$pdo = null;
         unset($ipLimiter);
     }
