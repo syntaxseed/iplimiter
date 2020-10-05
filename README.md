@@ -3,6 +3,8 @@ IPLimiter
 
 A lightweight, framework agnostic, PHP IP address logging library for tracking the # of attempts, and time of last attempt for various categories of events. An event is an IP address and category string combo. The library includes helpers for setting/getting ban status, deleting individual events or all events for a given IP, etc.
 
+Common uses include creating a tarpit or code-level gates/limits for any attempted action in your application.
+
 ![IPLimiter Screenshot](iplimiter_screenshot.png "Using IPLimiter for PHP IP event logging.")
 
 The IPLimiter constructor must be passed a connected PDO object to create a database table and log the events.
@@ -33,28 +35,31 @@ Installation
 
 Require with Composer:
 ```
-composer require syntaxseed/iplimiter ^1.0
+composer require syntaxseed/iplimiter ^2.0
 ```
-
+> **Major version 2 is not compatible with version 1.**
 
 Usage - Quick Start
 --------
 
-First ensure you have a connected PDO object. (http://php.net/manual/en/book.pdo.php).
+First ensure you have a connected PDO object. (http://php.net/manual/en/book.pdo.php). Or implement a new class which implements the included `DatabaseInterface`. An implementation of a class for PDO connections is included (`DatabasePDO`).
 
-Import the namespace into your application:
+Import the namespaces into your application:
 ```php
 use Syntaxseed\IPLimiter\IPLimiter;
+use Syntaxseed\IPLimiter\DatabasePDO;
 ```
 
-Initialize a PDO object and use it to create a new IPLimiter instance. The second parameter is your desired database table name for IPLimiter to use.
+Initialize a PDO object and use it to create a new IPLimiter instance. The second parameter is your desired database table name for IPLimiter to use. There is a `DatabasePDO` class included which implements the `DatabaseInterface` required by IPLimiter.
 ```php
-$ipLimiter = new IPLimiter($pdo, 'syntaxseed_iplimiter');
+$ipLimiter = new IPLimiter(new DatabasePDO($pdo), 'syntaxseed_iplimiter');
 ```
 
-**Create the IPLimiter table if it doesn't already exist.**
+If you aren't using PDO, you can implement a DB wrapper class which implements the 'Syntaxseed\IPLimiter\DatabaseInterface.
 
-This and future functions will use the PDO object injected via the constructor.
+**Create the IPLimiter table if it doesn't already exist:**
+
+This and future functions will use the DatabaseInterface object injected via the constructor.
 ```php
 $result = $ipLimiter->migrate();
 ```
@@ -71,7 +76,7 @@ $ipLimiter->log();
 
 Or, you can method chain the initialization of the object, setting of event, and logging:
 ```php
-$ipLimiter = (new IPLimiter($pdo, 'syntaxseed_iplimiter'))
+$ipLimiter = (new IPLimiter(new DatabasePDO($pdo), 'syntaxseed_iplimiter'))
             ->event('123.123.0.1', 'sendmail')
             ->log();
 ```
@@ -203,6 +208,7 @@ Contributing
 
 Changelog
 --------
+* v2.0.0 - IPLimiter now expects a database object which implments the included DatabaseInterface. A PDO implementation of this is included. NOTE: Not compatible with version 1 due to database column type change.
 * v1.0.4 - Add screenshot to readme.
 * v1.0.3 - Allow method chaining on the event() and log() methods.
 * v1.0.2 - Improve readme. Better package description.

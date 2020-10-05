@@ -16,3 +16,5 @@
 *.env.*
 !*.env.example
 *.phpunit.result.cache
+
+**/tests/example.php

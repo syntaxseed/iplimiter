@@ -1,20 +1,22 @@
 <?php
 namespace Syntaxseed\IPLimiter;
 
+use Syntaxseed\IPLimiter\DatabaseInterface;
+
 /**
  * IP Limiter will log IP addresses for event categories to the database along
  * with attempts and time of last attempt.
  * An 'event' is an IP address and category string combination, which are
  * needed to uniquely identify a record in the DB.
  * @author Sherri Wheeler
- * @version  1.1.0
- * @copyright Copyright (c) 2019, Sherri Wheeler - syntaxseed.com
+ * @version  2.0.0
+ * @copyright Copyright (c) 2020, Sherri Wheeler - syntaxseed.com
  * @license MIT
  */
 
 class IPLimiter
 {
-    protected $pdo;
+    protected $db;
     protected $tableName;
     protected $lastError = "";
     protected $ip;
@@ -23,22 +25,18 @@ class IPLimiter
     /**
      * Initialize the object with a connection and the table name.
      *
-     * @param PDO $pdo
+     * @param DatabaseInterface $db
      * @param string $tableName
      * @return void
      * @throws Exception
      */
-    public function __construct($pdo, $tableName='syntaxseed_iplimiter')
+    public function __construct(DatabaseInterface $db, $tableName='syntaxseed_iplimiter')
     {
-        if (is_null($pdo) || !is_a($pdo, 'PDO')) {
-            $this->lastError = 'IPLimiter requires a connected PDO object.';
-            throw new \Exception($this->lastError);
-        }
         if (empty($tableName) || !is_string($tableName)) {
             $this->lastError = 'IPLimiter requires a table name as the second parameter.';
             throw new \Exception($this->lastError);
         }
-        $this->pdo = $pdo;
+        $this->db = $db;
         $this->tableName = $tableName;
     }
 
@@ -68,14 +66,13 @@ class IPLimiter
         $this->checkEvent();
 
         try {
-            $sql = 'INSERT INTO '.$this->tableName.' (ip, category) VALUES (:ip, :category) ON DUPLICATE KEY UPDATE attempts=attempts+1, lastattempt=NOW();';
-            $stmt = $this->pdo
-                        ->prepare($sql)
-                        ->execute([$this->ip, $this->category]);
-        } catch (\PDOException $e) {
+            $sql = 'INSERT INTO '.$this->tableName.' (ip, category, lastattempt) VALUES (:ip, :category, '.time().') ON DUPLICATE KEY UPDATE attempts=attempts+1, lastattempt='.time().';';
+            $result = $this->db->executePrepared($sql, [$this->ip, $this->category]);
+        } catch (\Exception $e) {
             $this->lastError = $e->getMessage();
-            throw new \Exception($this->lastError);
+            throw $e;
         }
+
         return $this;
     }
 
@@ -91,13 +88,13 @@ class IPLimiter
 
         try {
             $sql = 'DELETE FROM '.$this->tableName.' WHERE ip=:ip AND category=:category;';
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$this->ip, $this->category]);
-        } catch (\PDOException $e) {
+            $result = $this->db->executePrepared($sql, [$this->ip, $this->category]);
+        } catch (\Exception $e) {
             $this->lastError = $e->getMessage();
-            throw new \Exception($this->lastError);
+            throw $e;
         }
-        if ($stmt->rowCount() < 1) {
+
+        if (is_null($result) || $result < 1) {
             return false;
         }
         return true;
@@ -113,13 +110,13 @@ class IPLimiter
     {
         try {
             $sql = 'DELETE FROM '.$this->tableName.' WHERE ip=:ip;';
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$ip]);
-        } catch (\PDOException $e) {
+            $result = $this->db->executePrepared($sql, [$ip]);
+        } catch (\Exception $e) {
             $this->lastError = $e->getMessage();
-            throw new \Exception($this->lastError);
+            throw $e;
         }
-        if ($stmt->rowCount() < 1) {
+
+        if (is_null($result) || $result < 1) {
             return false;
         }
         return true;
@@ -140,27 +137,25 @@ class IPLimiter
         }
     }
 
-     /**
-     * Determine whether a record exists in the DB for this event.
-     *
-     * @return bool
-     * @throws Exception
-     */
+    /**
+    * Determine whether a record exists in the DB for this event.
+    *
+    * @return bool
+    * @throws Exception
+    */
     public function exists()
     {
         $this->checkEvent();
 
         try {
             $sql = 'SELECT (1) as found FROM '.$this->tableName.' WHERE ip=:ip AND category=:category;';
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$this->ip, $this->category]);
-            $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
+            $result = $this->db->fetchPrepared($sql, [$this->ip, $this->category]);
+        } catch (\Exception $e) {
             $this->lastError = $e->getMessage();
-            throw new \Exception($this->lastError);
+            throw $e;
         }
 
-        if (!$result) {
+        if (empty($result)) {
             return false;
         }
         return ($result[0]['found'] == "1");
@@ -178,15 +173,13 @@ class IPLimiter
 
         try {
             $sql = 'SELECT attempts FROM '.$this->tableName.' WHERE ip=:ip AND category=:category;';
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$this->ip, $this->category]);
-            $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
+            $result = $this->db->fetchPrepared($sql, [$this->ip, $this->category]);
+        } catch (\Exception $e) {
             $this->lastError = $e->getMessage();
-            throw new \Exception($this->lastError);
+            throw $e;
         }
 
-        if (!$result) {
+        if (empty($result)) {
             return null;
         }
 
@@ -205,13 +198,13 @@ class IPLimiter
 
         try {
             $sql = 'UPDATE '.$this->tableName.' SET attempts=0 WHERE ip=:ip AND category=:category;';
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$this->ip, $this->category]);
-        } catch (\PDOException $e) {
+            $result = $this->db->executePrepared($sql, [$this->ip, $this->category]);
+        } catch (\Exception $e) {
             $this->lastError = $e->getMessage();
-            throw new \Exception($this->lastError);
+            throw $e;
         }
-        if ($stmt->rowCount() != 1) {
+
+        if (is_null($result) || $result != 1) {
             return false;
         }
         return true;
@@ -230,19 +223,19 @@ class IPLimiter
 
         try {
             $sql = 'SELECT lastattempt FROM '.$this->tableName.' WHERE ip=:ip AND category=:category;';
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$this->ip, $this->category]);
-            $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
+            $result = $this->db->fetchPrepared($sql, [$this->ip, $this->category]);
+        } catch (\Exception $e) {
             $this->lastError = $e->getMessage();
-            throw new \Exception($this->lastError);
+            throw $e;
         }
 
-        if (!$result) {
+
+
+        if (empty($result)) {
             return null;
         }
 
-        $lastAttempt = strtotime($result[0]['lastattempt']);
+        $lastAttempt = intval($result[0]['lastattempt']);
 
         if ($asSecondsAgo) {
             $lastAttempt = time() - $lastAttempt;
@@ -279,6 +272,8 @@ class IPLimiter
      */
     public function rule($rule)
     {
+        $this->checkEvent();
+
         if (!$this->isValidRule($rule)) {
             throw new \Exception($this->lastError);
         }
@@ -366,20 +361,19 @@ class IPLimiter
     {
         $this->checkEvent();
 
-        if($this->isBanned()) {
+        if ($this->isBanned()) {
             return true;
         }
 
         try {
             $sql = 'UPDATE '.$this->tableName.' SET banned=1 WHERE ip=:ip AND category=:category;';
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$this->ip, $this->category]);
-        } catch (\PDOException $e) {
+            $result = $this->db->executePrepared($sql, [$this->ip, $this->category]);
+        } catch (\Exception $e) {
             $this->lastError = $e->getMessage();
-            throw new \Exception($this->lastError);
+            throw $e;
         }
 
-        if ($stmt->rowCount() != 1) {
+        if (is_null($result) || $result != 1) {
             return false;
         }
         return true;
@@ -397,27 +391,25 @@ class IPLimiter
 
         try {
             $sql = 'SELECT banned FROM '.$this->tableName.' WHERE ip=:ip AND category=:category;';
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$this->ip, $this->category]);
-            $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
+            $result = $this->db->fetchPrepared($sql, [$this->ip, $this->category]);
+        } catch (\Exception $e) {
             $this->lastError = $e->getMessage();
-            throw new \Exception($this->lastError);
+            throw $e;
         }
 
-        if (!$result) {
+        if (empty($result)) {
             return false;
         }
 
         return ($result[0]['banned'] == 1);
     }
 
-     /**
-     * Set an IP as banned for the event category. Returns ban status.
-     *
-     * @return bool
-     * @throws Exception
-     */
+    /**
+    * Set an IP as banned for the event category. Returns ban status.
+    *
+    * @return bool
+    * @throws Exception
+    */
     public function unBan()
     {
         $this->checkEvent();
@@ -428,14 +420,13 @@ class IPLimiter
 
         try {
             $sql = 'UPDATE '.$this->tableName.' SET banned=0 WHERE ip=:ip AND category=:category;';
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$this->ip, $this->category]);
-        } catch (\PDOException $e) {
+            $result = $this->db->executePrepared($sql, [$this->ip, $this->category]);
+        } catch (\Exception $e) {
             $this->lastError = $e->getMessage();
-            throw new \Exception($this->lastError);
+            throw $e;
         }
 
-        if ($stmt->rowCount() != 1) {
+        if (is_null($result) || $result != 1) {
             return true;
         }
 
@@ -466,15 +457,15 @@ class IPLimiter
                 `ip` varchar(39) COLLATE ascii_general_ci NOT NULL,
                 `category` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
                 `attempts` int(10) unsigned NOT NULL DEFAULT '1',
-                `lastattempt` datetime NOT NULL DEFAULT NOW(),
+                `lastattempt` bigint(20) NOT NULL,
                 `banned` tinyint(1) NOT NULL DEFAULT '0',
                 PRIMARY KEY (`ip`, `category`)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
                 EOF;
-            $this->pdo->exec($sql);
-        } catch (\PDOException $e) {
+            $this->db->executeSQL($sql);
+        } catch (\Exception $e) {
             $this->lastError = $e->getMessage();
-            throw new \Exception($this->lastError);
+            throw $e;
         }
         return true;
     }
