@@ -1,6 +1,13 @@
 IPLimiter
 =========================
 
+<div align="center">
+    <img src="https://img.shields.io/github/tag/syntaxseed/iplimiter.svg" alt="GitHub tag (latest SemVer)">&nbsp;&nbsp;
+    <img src="https://img.shields.io/badge/PHP-7.0+-brightgreen.svg" alt="PHP v7.0+">&nbsp;&nbsp;
+    <img src="https://img.shields.io/github/license/syntaxseed/templateseed" alt="License: MIT"><br>
+    <a href="https://twitter.com/intent/follow?screen_name=syntaxseed"><img src="https://img.shields.io/twitter/follow/syntaxseed.svg?style=social&logo=twitter" alt="follow on Twitter"></a>&nbsp;&nbsp;<a href="https://syntaxseed.com/about/donate"><img src="https://img.shields.io/badge/Sponsor-Project-blue" alt="Sponsor Project" /></a>
+</div>
+
 A lightweight, framework agnostic, PHP IP address logging library for tracking the # of attempts, and time of last attempt for various categories of events. An event is an IP address and category string combo. The library includes helpers for setting/getting ban status, deleting individual events or all events for a given IP, etc.
 
 Common uses include creating a tarpit or code-level gates/limits for any attempted action in your application.
