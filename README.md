@@ -3,9 +3,10 @@ IPLimiter
 
 <div align="center">
     <img src="https://img.shields.io/github/tag/syntaxseed/iplimiter.svg" alt="GitHub tag (latest SemVer)">&nbsp;&nbsp;
-    <img src="https://img.shields.io/badge/PHP-7.0+-brightgreen.svg" alt="PHP v7.0+">&nbsp;&nbsp;
+    <img src="https://img.shields.io/badge/PHP-7.3+-brightgreen.svg" alt="PHP v7.3+">&nbsp;&nbsp;
+    <img src="https://img.shields.io/badge/PHP-8.0+-brightgreen.svg" alt="PHP v8.0+">&nbsp;&nbsp;
     <img src="https://img.shields.io/github/license/syntaxseed/templateseed" alt="License: MIT"><br>
-    <a href="https://twitter.com/intent/follow?screen_name=syntaxseed"><img src="https://img.shields.io/twitter/follow/syntaxseed.svg?style=social&logo=twitter" alt="follow on Twitter"></a>&nbsp;&nbsp;<a href="https://syntaxseed.com/about/donate"><img src="https://img.shields.io/badge/Sponsor-Project-blue" alt="Sponsor Project" /></a>
+    <a href="https://twitter.com/intent/follow?screen_name=syntaxseed"><img src="https://img.shields.io/twitter/follow/syntaxseed.svg?style=social&logo=twitter" alt="follow on Twitter"></a>&nbsp;&nbsp;<a href="https://github.com/syntaxseed#donatecontribute"><img src="https://img.shields.io/badge/Sponsor-Project-blue" alt="Sponsor Project" /></a>
 </div>
 
 A lightweight, framework agnostic, PHP IP address logging library for tracking the # of attempts, and time of last attempt for various categories of events. An event is an IP address and category string combo. The library includes helpers for setting/getting ban status, deleting individual events or all events for a given IP, etc.
@@ -20,7 +21,9 @@ The core function of the library is to execute a set of 'rules' which IPLimiter 
 
 Licence: MIT.
 
-Author: Sherri Wheeler
+Author: Sherri Wheeler.
+
+Current Version: 2.0.1.
 
 
 Features
@@ -35,6 +38,7 @@ Features
 * Reset # attempts after a given time has passed.
 * Flexible. IP Addresses and event strings can be anything.
 * Unit-Testing with PHPUnit.
+* Compliant with PHP 7.2+, 8.0+.
 
 
 Installation
@@ -210,11 +214,12 @@ $ruleResult = $ipLimiter->rule('{
 Contributing
 --------
 * Pull requests are welcome and appreciated! Please be patient while I find time to review.
-* Donations: https://syntaxseed.com/about/donate/
+* Donations: https://github.com/syntaxseed#donatecontribute
 
 
 Changelog
 --------
+* v2.0.1 - Tested for PHP 8.0, fix PSR formatting.
 * v2.0.0 - IPLimiter now expects a database object which implments the included DatabaseInterface. A PDO implementation of this is included. NOTE: Not compatible with version 1 due to database column type change.
 * v1.0.4 - Add screenshot to readme.
 * v1.0.3 - Allow method chaining on the event() and log() methods.

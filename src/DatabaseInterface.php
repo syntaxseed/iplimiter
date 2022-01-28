@@ -9,8 +9,8 @@ namespace Syntaxseed\IPLimiter;
  * @license MIT
  */
 
-interface DatabaseInterface{
-
+interface DatabaseInterface
+{
     public function executePrepared(string $statement, array $values) : ?int;
 
     public function fetchPrepared(string $statement, array $values) : array;

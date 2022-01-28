@@ -11,16 +11,18 @@ use Syntaxseed\IPLimiter\DatabaseInterface;
  * @license MIT
  */
 
-class DatabasePDO implements DatabaseInterface{
-
+class DatabasePDO implements DatabaseInterface
+{
     protected $pdo;
 
-    public function __construct(\PDO $pdo){
+    public function __construct(\PDO $pdo)
+    {
         $this->pdo = $pdo;
     }
 
-    public function executePrepared(string $statement, array $values) : ?int {
-        try{
+    public function executePrepared(string $statement, array $values) : ?int
+    {
+        try {
             $stmt = $this->pdo->prepare($statement);
             $stmt->execute($values);
             return $stmt->rowCount();
@@ -30,7 +32,8 @@ class DatabasePDO implements DatabaseInterface{
         return null;
     }
 
-    public function fetchPrepared(string $statement, array $values) : array {
+    public function fetchPrepared(string $statement, array $values) : array
+    {
         try {
             $stmt = $this->pdo->prepare($statement);
             $stmt->execute($values);
@@ -42,7 +45,8 @@ class DatabasePDO implements DatabaseInterface{
         }
     }
 
-    public function executeSQL(string $sql) : int {
+    public function executeSQL(string $sql) : int
+    {
         try {
             return $this->pdo->exec($sql);
         } catch (\PDOException $e) {
