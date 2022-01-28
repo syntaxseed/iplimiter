@@ -23,7 +23,7 @@ Licence: MIT.
 
 Author: Sherri Wheeler.
 
-Current Version: 2.0.1.
+Current Version: 2.0.2.
 
 
 Features
@@ -219,7 +219,7 @@ Contributing
 
 Changelog
 --------
-* v2.0.1 - Tested for PHP 8.0, fix PSR formatting.
+* v2.0.2 - Tested for PHP 8.0, fix PSR formatting.
 * v2.0.0 - IPLimiter now expects a database object which implments the included DatabaseInterface. A PDO implementation of this is included. NOTE: Not compatible with version 1 due to database column type change.
 * v1.0.4 - Add screenshot to readme.
 * v1.0.3 - Allow method chaining on the event() and log() methods.
