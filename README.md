@@ -38,7 +38,7 @@ Features
 * Reset # attempts after a given time has passed.
 * Flexible. IP Addresses and event strings can be anything.
 * Unit-Testing with PHPUnit.
-* Compliant with PHP 7.2+, 8.0+.
+* Compliant with PHP 7.3+, 8.0+.
 
 
 Installation
