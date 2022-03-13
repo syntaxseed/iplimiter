@@ -1,4 +1,5 @@
 <?php
+
 namespace Syntaxseed\IPLimiter;
 
 /**
@@ -11,9 +12,9 @@ namespace Syntaxseed\IPLimiter;
 
 interface DatabaseInterface
 {
-    public function executePrepared(string $statement, array $values) : ?int;
+    public function executePrepared(string $statement, array $values): ?int;
 
-    public function fetchPrepared(string $statement, array $values) : array;
+    public function fetchPrepared(string $statement, array $values): array;
 
-    public function executeSQL(string $sql) : int;
+    public function executeSQL(string $sql): int;
 }

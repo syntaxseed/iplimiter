@@ -1,4 +1,5 @@
 <?php
+
 namespace Syntaxseed\IPLimiter;
 
 use Syntaxseed\IPLimiter\DatabaseInterface;

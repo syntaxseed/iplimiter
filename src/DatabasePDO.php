@@ -1,4 +1,5 @@
 <?php
+
 namespace Syntaxseed\IPLimiter;
 
 use Syntaxseed\IPLimiter\DatabaseInterface;
@@ -20,7 +21,7 @@ class DatabasePDO implements DatabaseInterface
         $this->pdo = $pdo;
     }
 
-    public function executePrepared(string $statement, array $values) : ?int
+    public function executePrepared(string $statement, array $values): ?int
     {
         try {
             $stmt = $this->pdo->prepare($statement);
@@ -32,7 +33,7 @@ class DatabasePDO implements DatabaseInterface
         return null;
     }
 
-    public function fetchPrepared(string $statement, array $values) : array
+    public function fetchPrepared(string $statement, array $values): array
     {
         try {
             $stmt = $this->pdo->prepare($statement);
@@ -45,7 +46,7 @@ class DatabasePDO implements DatabaseInterface
         }
     }
 
-    public function executeSQL(string $sql) : int
+    public function executeSQL(string $sql): int
     {
         try {
             return $this->pdo->exec($sql);

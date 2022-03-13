@@ -1,4 +1,5 @@
 <?php
+
 use Syntaxseed\IPLimiter\DatabasePDO;
 
 /**
@@ -35,7 +36,7 @@ class IPLimiterTest extends PHPUnit\Framework\TestCase
     /**
      * Called before all tests in this class are run.
      */
-    public static function setUpBeforeClass() : void
+    public static function setUpBeforeClass(): void
     {
         self::connectToDB();
     }
@@ -43,8 +44,9 @@ class IPLimiterTest extends PHPUnit\Framework\TestCase
     /**
      * Called before each test method is run.
      */
-    protected function setUp() : void
-    {}
+    protected function setUp(): void
+    {
+    }
 
     /**
     * Test migrating the database table.
@@ -228,7 +230,6 @@ class IPLimiterTest extends PHPUnit\Framework\TestCase
             "allowBanned":false
         }');
         $this->assertFalse($ruleResult);
-
     }
 
     /**
@@ -269,7 +270,6 @@ class IPLimiterTest extends PHPUnit\Framework\TestCase
 
         $attempts = $ipLimiter->attempts();
         $this->assertEquals(0, $attempts);
-
     }
 
     public function testIpV6Address()
@@ -282,14 +282,13 @@ class IPLimiterTest extends PHPUnit\Framework\TestCase
 
         $this->assertEquals(2, $attempts);
         $ipLimiter->deleteEvent();
-
     }
 
 
     /**
      * Called after all tests in this class are run.
      */
-    public static function tearDownAfterClass() : void
+    public static function tearDownAfterClass(): void
     {
         $ipLimiter = new Syntaxseed\IPLimiter\IPLimiter(new DatabasePDO(self::$pdo), 'syntaxseed_iplimiter');
         $ipLimiter->deleteIP('0.0.0.1');
