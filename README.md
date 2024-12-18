@@ -24,7 +24,7 @@ Licence: MIT.
 
 Author: Sherri Wheeler.
 
-Current Version: 2.0.3.
+Current Version: 2.0.4.
 
 
 Features
@@ -39,7 +39,7 @@ Features
 * Reset # attempts after a given time has passed.
 * Flexible. IP Addresses and event strings can be anything.
 * Unit-Testing with PHPUnit.
-* Compliant with PHP 7.3+, 8.0+, 8.1+.
+* Compliant with PHP  8.0+, 8.1+, 8.2+, 8.3+.
 
 
 Installation
@@ -220,6 +220,7 @@ Contributing
 
 Changelog
 --------
+* v2.0.4 - Tested & updated for PHP 8.2 & 8.3.
 * v2.0.3 - Tested for PHP 8.1.
 * v2.0.2 - Tested for PHP 8.0, fix PSR formatting.
 * v2.0.0 - IPLimiter now expects a database object which implments the included DatabaseInterface. A PDO implementation of this is included. NOTE: Not compatible with version 1 due to database column type change.
